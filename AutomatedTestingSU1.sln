@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "AutomatedTestingSU1", "AutomatedTestingSU1\AutomatedTestingSU1.pyproj", "{A0CAA604-EDD0-410E-8B34-3C25D82C811D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A0CAA604-EDD0-410E-8B34-3C25D82C811D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0CAA604-EDD0-410E-8B34-3C25D82C811D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {65CA8CE7-8CD1-4E6B-9EA6-0584D198F2E6}
+	EndGlobalSection
+EndGlobal
