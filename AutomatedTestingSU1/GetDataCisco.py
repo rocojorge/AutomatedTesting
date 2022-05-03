@@ -6,7 +6,7 @@
 # error = 2, human error, code or input.
 # error = 1, internal error, the function crash.
 
-import paramiko,time,os,re,getpass,shutil,scp
+import paramiko,time,os,re,getpass,shutil,scp,sys
 import IFX_SCONF
 
 firstDir = '/tmp'
@@ -163,22 +163,26 @@ def RunCommand(session,out,HOSTNAME,USER,command):
             listo = session.recv_ready()
             if listo:
                 output = session.recv(65000*out).decode(encoding = 'cp850')
+                outputstr = str(output)
+                outputlist.append(outputstr)
             if num >= 20:
                 outputlist = None
                 num = None
                 break
-            outputstr = str(output)
-            outputlist.append(outputstr)
-            #while not re.search('\[['+USER+']*.'+HOSTNAME+' ~\]\$', outputstr) and listo:# LINUX VERSION
-            while not re.search(''+USER+'*.'+HOSTNAME, outputstr) and listo: #CISCO ROUTERS VERSION
+            while not re.search('\[['+USER+']*.'+HOSTNAME+' .+]\$', outputstr) and listo:# LINUX VERSION
+            #while not re.search(''+USER+'*.'+HOSTNAME, outputstr) and listo: #CISCO ROUTERS VERSION
                 out +=2
-                output = session.recv(65000*out).decode(encoding='cp850')
-                time.sleep(0.1)
-                outputstr = str(output)
-                outputlist.append(outputstr)
+                if listo:
+                    try:
+                        output = session.recv(65000*out).decode(encoding='cp850')
+                        outputstr = str(output)
+                        outputlist.append(outputstr)
+                    except:
+                        print('Waiting',file=sys.stderr)
+                time.sleep(0.5)
                 listo = session.recv_ready()
-           # if re.search('\[['+USER+']*.'+HOSTNAME+' ~\]\$', outputstr): #LinuxVersion
-            if re.search('['+USER+']*.'+HOSTNAME, outputstr):
+            if re.search('\[['+USER+']*.'+HOSTNAME+' .+]\$', outputstr): #LinuxVersion
+            #if re.search('['+USER+']*.'+HOSTNAME, outputstr):
                 listo = True
             num+=1
             out+=2

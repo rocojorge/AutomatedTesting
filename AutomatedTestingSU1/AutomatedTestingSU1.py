@@ -1,70 +1,57 @@
-import paramiko, scp, os, shutil, time, re
-hostname = '172.20.133.12'
-username = 'gencom'
-password = 'y8gf839i'
+import paramiko, scp, os, shutil, time, GetDataCisco
+
+hostname = 'ip'
+username = 'user'
+password = 'pass'
 port = 22
-cliente = paramiko.SSHClient()
-cliente.set_missing_host_key_policy( paramiko.AutoAddPolicy() )
-cliente.connect(hostname=hostname, 
-                username=username, 
-                password=password, 
-                auth_timeout=25,
-                port=port)
-session = cliente.invoke_shell()
-session.settimeout(timeout=20)
+out_number = 1
+variable = "y"
 
-scp_cliente = scp.SCPClient (cliente.get_transport() )
+while variable != "n":
+    scp_session,error = GetDataCisco.ConnectToSCP(hostname,username,password,port)
+    archivio = input('Nome archivio: ')
+    if archivio == 'n':break
+    archivio+='.py'
+    ruta = os.path.join(r"C:\Users\gabriel.melero\source\repos\GetDataCisco\GetDataCisco",archivio) 
+    #You should change this if you want to use it in your local computer
+    ruta2 = os.path.join(r"C:\Users\gabriel.melero\source\repos\AutomatedTestingSU1\AutomatedTestingSU1\PROVAS", archivio )
+    #And this root to jejejej, because its for my WiNdOwS CoMpUtEr as you can see
+    ruta3 = os.path.join(r"/home/gencom/GetDataCisco/GetDataCisco")
 
-archivio = input('Nome archivio: ')
-ruta = os.path.join(r"C:\Users\gabriel.melero\source\repos\GetDataCisco\GetDataCisco",archivio) 
-#You should change this if you want to use it in your local computer
-ruta2 = os.path.join(r"C:\Users\gabriel.melero\source\repos\AutomatedTestingSU1\AutomatedTestingSU1", archivio )
-#And this root to jejejej, because its for my WiNdOwS CoMpUtEr as you can see
-ruta3 = os.path.join(r"/home/gencom/GetDataCisco/GetDataCisco")
+    shutil.copyfile( ruta, ruta2 )
+    print(ruta)
+    print("Copied...")
 
-shutil.copyfile( ruta, ruta2 )
-scp_cliente.put(ruta2, remote_path=ruta3 )
+    scp_session.put( ruta2,ruta3 )
+    print('Send it to...')
+    print(ruta3)
+    scp_session.close()
 
-scp_cliente.close()
-#Abro una nueva conexion
-cliente = paramiko.SSHClient()
-cliente.set_missing_host_key_policy( paramiko.AutoAddPolicy() )
-cliente.connect(hostname=hostname, 
-                username=username, 
-                password=password, 
-                auth_timeout=25,
-                port=port)
-session = cliente.invoke_shell()
-session.settimeout(timeout=20)
-session.send('ll | grep source\n ')
-time.sleep(.5)
-print( session.recv(65000).decode() )
-sourceFile = input('Which source file you want?: ')
-session.send('set -a ; source /home/gencom/'+sourceFile+' ; set +a\n')
-time.sleep(.5)
-print( session.recv(65000).decode('cp850') )
-session.send('env | grep IFX\n')
-time.sleep(.5)
-print( session.recv(65000).decode() )
+    ssh_session, error = GetDataCisco.ConnectToSSH(hostname,username,password,port)
+    USER,HOSTNAME = GetDataCisco.TakeUserHostName( ssh_session )
 
-session.send('cd /home/gencom/GetDataCisco/GetDataCisco\n')
-time.sleep(.5)
-session.recv(65000).decode()
+    command = 'cd '+ruta3+'\n'
+    lista, error = GetDataCisco.RunCommand( ssh_session ,out_number, HOSTNAME, USER, command=command )
+    for line in lista:
+        print(line)
+    print('\n')
+    command = input('Number of the source file: ')
+    if command == 'n':break
+    command = r'set -a ; source /home/gencom/source'+str(command)+'.sh ; set +a'
 
-session.send('python3 '+ archivio +'\n')
-time.sleep(.5)
-print( session.recv(65000).decode("cp850"))
+    lista, error = GetDataCisco.RunCommand( ssh_session ,out_number, HOSTNAME, USER, command=command )
+    for line in lista:
+        print(line)
 
-time.sleep(.5)
-num= 1
-while not session.recv_ready():
-    try:
-        print( session.recv(65000).decode("cp850"))
-    except:
-        print("\n")
+    command = 'python3 '+ archivio + '\n'
+    lista, error = GetDataCisco.RunCommand( ssh_session ,out_number, HOSTNAME, USER, command=command )
+    for line in lista:
+        print(line)
+    print('\n')
 
-    time.sleep(.5)
-    num+=1
-    if num==10:
-        break
+    variable = input("Would you like to do it again?(N=Uscita, Other=Continua) : ")
+
+print("Uscire correttamente")
+
+
 
